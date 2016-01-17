@@ -9,7 +9,7 @@ from autobahn.asyncio.wamp import ApplicationRunner
 from autobahn.asyncio.wamp import ApplicationSession
 
 from quamash import QEventLoop
-from PyQt5.QtGui import QFont
+
 
 def wrap_in_future(func):
     @functools.wraps(func)
@@ -23,8 +23,9 @@ class MainWindow(ApplicationSession, QMainWindow):
     def __init__(self, config=None):
         ApplicationSession.__init__(self, config)
         QMainWindow.__init__(self)
+        self.bla = "hh"
 
-        self.the_widget = MainWidget()
+        self.the_widget = MainWidget(parent=self)
         self.statusBar()
         self.main_window_init()
 
@@ -36,18 +37,7 @@ class MainWindow(ApplicationSession, QMainWindow):
         print("session ready")
         yield from self.subscribe(self.time_event_handler, 'com.myapp.the_time')
 
-    @wrap_in_future  # PyQT5 can't call a coroutine directly so we wrap it in a future
-    @asyncio.coroutine
-    def the_widget_add_numbers(self, list_of_number=None):
-        print("call it baby !")
-
-        result = yield from self.call('com.myapp.add', list_of_number)
-
-        print("I called baby ! ", result)
-        self.the_widget.addition_result_signal.emit(str(result))
-
     def main_window_init(self):
-        self.the_widget.add_the_numbers_signal.connect(self.the_widget_add_numbers)
         self.setCentralWidget(self.the_widget)
 
         #                 x    y  x_size y_size
@@ -58,11 +48,9 @@ class MainWindow(ApplicationSession, QMainWindow):
 
 class MainWidget(QWidget):
 
-    add_the_numbers_signal = pyqtSignal([list])
-    addition_result_signal = pyqtSignal([str])
-
-    def __init__(self):
-        super().__init__()
+    def __init__(self, parent):
+        # this allow the use of the parent's methods when needed
+        super(MainWidget, self).__init__(parent=parent)
 
         self.number_1 = QLineEdit()
         self.number_2 = QLineEdit()
@@ -77,18 +65,25 @@ class MainWidget(QWidget):
         self.setLayout(grid)
 
         self.addition_button.clicked.connect(self.collect_numbers)
-        self.addition_result_signal.connect(self.addition_result.setText)
 
         grid.addWidget(self.number_1, 0, 0)
         grid.addWidget(self.number_2, 0, 3)
         grid.addWidget(self.addition_button, 1, 2)
         grid.addWidget(self.addition_result, 2, 2)
 
-    def collect_numbers(self):
+    @wrap_in_future  # PyQT5 can't call a coroutine directly so we wrap it in a future
+    @asyncio.coroutine
+    # the function is called with a second positional argument that is False
+    # I haven't figured out why
+    def collect_numbers(self, dummy=False):
         number_1 = self.number_1.displayText()
         number_2 = self.number_2.displayText()
+
         print("numbers to add: ", [number_1, number_2])
-        self.add_the_numbers_signal.emit([number_1, number_2])
+
+        # make the wamp call using the call method instantiated in the MainWindows class
+        result = yield from self.parent().call('com.myapp.add', [number_1, number_2])
+        self.addition_result.setText(str(result))
 
 
 if __name__ == "__main__":
