@@ -16,7 +16,7 @@ Here is a example PyQt5 app that
 ## Usage
 1. Run the ```launch_crossbar.sh``` script.
 2. Launch the ```Wamp_Backend.py``` file.
-3. Launch the ```PyQt5_GUI.py````file.
+3. Launch the ```PyQt5_GUI.py``` file.
 
 ## Note
 I tried to keep it simple but non-trivial so you can build something out of this, if something is not clear just open an issue.
