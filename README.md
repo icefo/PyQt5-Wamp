@@ -1,5 +1,10 @@
 # PyQt5-Wamp
 
+PyQt5 is the python bindings to the Qt5 GUI framework and Wamp stands for *web application messaging protocol*
+
+WAMP is an open standard WebSocket subprotocol that provides two application messaging patterns in one unified protocol:
+Remote Procedure Calls + Publish & Subscribe. More info [here](http://wamp-proto.org/)
+
 Here is a example PyQt5 app that
 * can use wamp's RPC to add two numbers
 * can subscribe to a wamp topic that publish the time every 2 seconds
