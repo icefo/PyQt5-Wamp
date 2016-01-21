@@ -2,11 +2,11 @@ import sys
 import functools
 import asyncio
 
-from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QMainWindow, QApplication, QPushButton, QWidget, QLineEdit, QGridLayout
 
 from autobahn.asyncio.wamp import ApplicationRunner
 from autobahn.asyncio.wamp import ApplicationSession
+from autobahn import wamp
 
 from quamash import QEventLoop
 
@@ -29,13 +29,18 @@ class MainWindow(ApplicationSession, QMainWindow):
         self.statusBar()
         self.main_window_init()
 
+    @wamp.subscribe('com.myapp.the_time')
     def time_event_handler(self, time):
         self.statusBar().showMessage("Time: " + time, msecs=2000)
 
     @asyncio.coroutine
     def onJoin(self, details):
         print("session ready")
-        yield from self.subscribe(self.time_event_handler, 'com.myapp.the_time')
+        try:
+            res = yield from self.subscribe(self)
+            print("Subscribed to {0} procedure(s)".format(len(res)))
+        except Exception as e:
+            print("could not subscribe to procedure: {0}".format(e))
 
     def main_window_init(self):
         self.setCentralWidget(self.the_widget)
