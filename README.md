@@ -14,7 +14,7 @@ Here is a example PyQt5 app that
 * [the crossbar wamp router](http://crossbar.io/)
 
 ## Usage
-1. Run the ```launch_crossbar.sh``` script.
+1. ```cd``` in directory and type ```crossbar start```.
 2. Launch the ```Wamp_Backend.py``` file.
 3. Launch the ```PyQt5_GUI.py``` file.
 
