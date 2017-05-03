@@ -4,8 +4,7 @@ import asyncio
 
 from PyQt5.QtWidgets import QMainWindow, QApplication, QPushButton, QWidget, QLineEdit, QGridLayout
 
-from autobahn.asyncio.wamp import ApplicationRunner
-from autobahn.asyncio.wamp import ApplicationSession
+from autobahn.asyncio.wamp import ApplicationRunner, ApplicationSession
 from autobahn import wamp
 
 from quamash import QEventLoop
@@ -83,7 +82,6 @@ class MainWidget(QWidget):
     def collect_numbers(self, dummy=False):
         number_1 = self.number_1.displayText()
         number_2 = self.number_2.displayText()
-
         print("numbers to add: ", [number_1, number_2])
 
         # make the wamp call using the call method instantiated in the MainWindows class

@@ -1,27 +1,13 @@
 import asyncio
-import signal
-import functools
 from datetime import datetime
 
 from autobahn import wamp
 from autobahn.asyncio.wamp import ApplicationSession, ApplicationRunner
 
 
-def wrap_in_future(func):
-    @functools.wraps(func)
-    def wrapper(*args, **kw):
-        asyncio.async(func(*args, **kw))
-    return wrapper
-
-
 class MyBackend(ApplicationSession):
     def __init__(self, config=None):
         super().__init__(config)
-        loop = asyncio.get_event_loop()
-        # you should abort any long operation on SIGINT and you can do what you want SIGTERM
-        # In both cases the program should exit cleanly
-        loop.add_signal_handler(signal.SIGINT, self.exit_cleanup)  # SIGINT = Ctrl-C
-        loop.add_signal_handler(signal.SIGTERM, self.exit_cleanup)  # the kill command use this signal by default
 
         # print the contents of the 'extra' parameter set below
         print(config.extra)
@@ -58,24 +44,6 @@ class MyBackend(ApplicationSession):
             time_now = str(datetime.now().replace(microsecond=0))
             self.publish('com.myapp.the_time', time_now)
             yield from asyncio.sleep(2)
-
-    @wrap_in_future  # the signal handler can't call a coroutine directly so we wrap it in a future
-    @asyncio.coroutine
-    def exit_cleanup(self):
-        print("closing_time")
-
-        # do some cleaning, wait for subprocess/coroutines to complete..,
-        yield from asyncio.sleep(5)
-
-        loop = asyncio.get_event_loop()
-        for task in asyncio.Task.all_tasks():
-            # this is to avoid the cancellation of this coroutine because this coroutine need to be the last one running
-            # to cancel all the others.
-            if task is not asyncio.Task.current_task():
-                task.cancel()
-
-        print("everything has been cancelled")
-        loop.stop()
 
 
 if __name__ == "__main__":

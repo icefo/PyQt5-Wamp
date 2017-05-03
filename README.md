@@ -12,7 +12,7 @@ Here is a example PyQt5 app that
 ![capture-pyqt5-wamp](https://cloud.githubusercontent.com/assets/7746352/12374901/ea684d9c-bcab-11e5-87fd-9f2a5d5ce7f2.png)
 
 ## Requirements:
-* Python >= 3.4
+* Python 3.4, 3.5
 * PyQt5 (use your package manager to install this lib)
 * [Quamash](https://github.com/harvimt/quamash) (asyncio event loop for pyqt)
 * [autobahn|python](http://autobahn.ws/python/) (the wamp client)
